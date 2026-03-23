@@ -1,0 +1,14 @@
+# Node.js
+node_modules/
+
+# Python
+venv/
+.env
+__pycache__/
+
+# Log files
+*.log
+
+# Mac/Windows system files
+.DS_Store
+Thumbs.db

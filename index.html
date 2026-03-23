@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hệ Thống Quản Lý Đơn Hàng - Demo</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-content">
+          <h1><span class="icon">📦</span> Hệ Thống Quản Lý Đơn Hàng</h1>
+          
+        </div>
+      </header>
+
+      <!-- Main layout Grid -->
+      <main class="main-grid">
+  <section class="form-section admin-panel">
+    <h2><span class="icon">🔑</span> Chủ Cửa Hàng: Nhập Kho</h2>
+    <form id="productForm">
+      <div class="input-group">
+        <label>Tên Sản Phẩm (Giày)</label>
+        <input type="text" id="newName" placeholder="VD: Nike Jordan 1" required />
+      </div>
+      <div class="input-group">
+        <label>Giá Niêm Yết (VNĐ)</label>
+        <input type="number" id="newPrice" placeholder="1500000" required />
+      </div>
+      <div class="input-group">
+        <label>Số Lượng Nhập Kho</label>
+        <input type="number" id="newStock" placeholder="50" required />
+      </div>
+      <button type="submit" class="btn btn-primary" style="background: #2ecc71;">Nhập Hàng Vào Kho</button>
+    </form>
+  </section>
+
+  <section class="form-section staff-panel">
+    <h2><span class="icon">🛒</span> Nhân Viên: Bán Hàng</h2>
+    <form id="orderForm">
+      <div class="input-group">
+        <label>Chọn Sản Phẩm Trong Kho</label>
+        <select id="selectProduct" required>
+          <option value="">-- Đang tải danh sách giày --</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Số Lượng Khách Mua</label>
+        <input type="number" id="quantity" min="1" value="1" required />
+      </div>
+      <div class="price-preview" id="pricePreview">Giá: 0 VNĐ</div>
+      <button type="submit" class="btn btn-primary">Xác Nhận Chốt Đơn</button>
+    </form>
+  </section>
+</main>
+
+        <!-- Dashboard bảng đơn hàng -->
+        <section class="dashboard">
+          <div class="dashboard-header">
+            <h2>Danh Sách Đơn Hàng</h2>
+            <div class="total-amount" id="totalAmount">Tổng: 0 VNĐ</div>
+          </div>
+          <div class="loading" id="loading">
+            <div class="spinner"></div>
+            Đang tải...
+          </div>
+          <div class="table-container">
+            <table id="ordersTable">
+              <thead>
+                <tr>
+                  <th>Mã Đơn</th>
+                  <th>Giá</th>
+                  <th>Số Lượng</th>
+                  <th>Thành Tiền</th>
+                  <th>Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Dữ liệu sẽ render bởi JS -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Toast thông báo -->
+    <div id="toast" class="toast hidden">
+      <span id="toastMsg"></span>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

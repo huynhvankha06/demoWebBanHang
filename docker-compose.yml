@@ -1,0 +1,51 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: sqlserver
+    environment:
+      SA_PASSWORD: 'Abc123@123'
+      ACCEPT_EULA: 'Y'
+    ports:
+      - '1433:1433'
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'Abc123@123' -Q 'SELECT 1' || exit 1",
+        ]
+      interval: 10s
+      retries: 30
+      timeout: 10s
+      start_period: 15s
+
+  # Thêm service này để tự động chạy file order.sql
+  db-init:
+    image: mcr.microsoft.com/mssql-tools
+    container_name: mssql-init
+    depends_on:
+      db:
+        condition: service_healthy # Đợi SQL Server bật xong
+    volumes:
+      - ./order.sql:/order.sql # Nạp file order.sql của bạn vào
+    command: >
+      /bin/bash -c "
+        echo 'Dang khoi tao Database...' &&
+        /opt/mssql-tools/bin/sqlcmd -S db -U sa -P 'Abc123@123' -i /order.sql &&
+        echo 'Tao Database thanh cong!'
+      "
+
+  app:
+    build: .
+    container_name: nodeapp
+    ports:
+      - '3000:3000'
+    depends_on:
+      db:
+        condition: service_healthy
+      db-init:
+        condition: service_completed_successfully # Bắt buộc đợi db-init chạy xong mới bật Web
+    environment:
+      DB_SERVER: db
+      DB_USER: sa
+      DB_PASSWORD: 'Abc123@123'
+      DB_NAME: ProductDB
