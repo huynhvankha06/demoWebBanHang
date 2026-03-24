@@ -124,11 +124,18 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({ productId, quantity, price }),
       });
 
+      // Lấy dữ liệu phản hồi từ server để kiểm tra lỗi
+      const data = await response.json();
+
       if (response.ok) {
+        // Đặt hàng thành công
         showToast('Nhân viên đã chốt đơn!');
         orderForm.reset();
         loadOrders();
         loadProductList(); // Cập nhật lại số tồn kho hiển thị
+      } else {
+        // Có lỗi từ server (ví dụ: số lượng vượt tồn kho)
+        showToast(data.error || 'Lỗi khi đặt hàng', 'error');
       }
     } catch (err) {
       showToast('Lỗi kết nối', 'error');

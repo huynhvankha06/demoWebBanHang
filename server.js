@@ -71,12 +71,34 @@ app.get('/products', async (req, res) => {
 
 // --- KHU VỰC CỦA NHÂN VIÊN BÁN HÀNG ---
 
-// 3. Tạo đơn hàng (Máy tự lấy giá từ productId gửi lên)
+// 3. Tạo đơn hàng (Đã thêm logic kiểm tra tồn kho)
 app.post('/order', async (req, res) => {
   try {
     let { productId, quantity, price } = req.body;
 
-    // Lưu đơn hàng vào Database kèm theo giá tại thời điểm bán
+    // Lấy số lượng tồn kho hiện tại của sản phẩm
+    const checkStockResult =
+      await sql.query`SELECT stock FROM Products WHERE id = ${productId}`;
+
+    // Kiểm tra xem sản phẩm có tồn tại không
+    if (checkStockResult.recordset.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, error: 'Sản phẩm không tồn tại.' });
+    }
+
+    const currentStock = checkStockResult.recordset[0].stock;
+
+    // Kiểm tra số lượng khách mua có vượt quá tồn kho không
+    if (quantity > currentStock) {
+      // Nếu vượt quá, trả về mã lỗi 400 và thông báo ngay lập tức, chặn không cho lưu Database
+      return res.status(400).json({
+        success: false,
+        error: `Hàng không đủ! Trong kho chỉ còn ${currentStock} sản phẩm.`,
+      });
+    }
+
+    // Nếu đủ hàng thì mới lưu đơn hàng vào Database
     await sql.query`
         INSERT INTO Orders(productId, quantity, price)
         VALUES(${productId}, ${quantity}, ${price})
@@ -85,11 +107,11 @@ app.post('/order', async (req, res) => {
     res.json({ success: true, message: 'Chốt đơn thành công' });
   } catch (err) {
     console.error('Order error:', err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// 4. Xem danh sách đơn hàng đã bán (Hiển thị tên giày cho dễ nhìn)
+// 4. Xem danh sách đơn hàng đã bán
 app.get('/orders', async (req, res) => {
   try {
     const result = await sql.query(`

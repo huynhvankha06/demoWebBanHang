@@ -36,18 +36,23 @@ BEGIN
 END;
 
 
-Tạo Trigger tự động trừ kho khi có đơn hàng mới (từ code của bạn)
-CREATE TRIGGER trg_UpdateStock
+--Tạo Trigger tự động trừ kho khi có đơn hàng mới (từ code của bạn)
+CREATE TRIGGER trg_CheckStock
 ON Orders
 AFTER INSERT
 AS
 BEGIN
-    UPDATE Products
-    SET stock = stock - i.quantity
-    FROM Products p
-    JOIN inserted i ON p.id = i.productId;
+    IF EXISTS (
+        SELECT 1
+        FROM Products p
+        JOIN inserted i ON p.id = i.productId
+        WHERE p.stock < i.quantity
+    )
+    BEGIN
+        RAISERROR (N'Không đủ hàng trong kho', 16, 1);
+        ROLLBACK TRANSACTION;
+    END
 END;
-GO
 
 -- Thêm sẵn một vài dữ liệu mẫu để test Web
 INSERT INTO Products (name, price, stock) VALUES 
