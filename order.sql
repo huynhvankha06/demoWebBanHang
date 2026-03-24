@@ -1,4 +1,4 @@
--- 1. Tạo Database
+-- Tạo Database
 IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'ProductDB')
 BEGIN
     CREATE DATABASE ProductDB;
@@ -8,7 +8,7 @@ GO
 USE ProductDB;
 GO
 
--- 2. Tạo bảng Products
+-- Tạo bảng Products
 CREATE TABLE Products (
     id INT IDENTITY PRIMARY KEY,
     name NVARCHAR(100),
@@ -17,7 +17,7 @@ CREATE TABLE Products (
 );
 GO
 
--- 3. Tạo bảng Orders
+-- Tạo bảng Orders
 CREATE TABLE Orders (
     id INT IDENTITY PRIMARY KEY,
     productId INT,
@@ -26,7 +26,17 @@ CREATE TABLE Orders (
 );
 GO
 
--- 4. Tạo Trigger tự động trừ kho khi có đơn hàng mới (từ code của bạn)
+
+-- Hàm tính tổng
+CREATE FUNCTION fn_TotalPrice (@price FLOAT, @quantity INT)
+RETURNS FLOAT
+AS
+BEGIN
+    RETURN @price * @quantity;
+END;
+
+
+Tạo Trigger tự động trừ kho khi có đơn hàng mới (từ code của bạn)
 CREATE TRIGGER trg_UpdateStock
 ON Orders
 AFTER INSERT
@@ -39,7 +49,7 @@ BEGIN
 END;
 GO
 
--- 5. Thêm sẵn một vài dữ liệu mẫu để test Web
+-- Thêm sẵn một vài dữ liệu mẫu để test Web
 INSERT INTO Products (name, price, stock) VALUES 
 (N'Giày Nike Precision 5', 1500000, 50),
 (N'Giày Nike Mamba Focus', 2200000, 30),
